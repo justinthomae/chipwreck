@@ -23,8 +23,26 @@
     <title>ChipWreck</title>
     <script type="module" crossorigin src="./assets/index-D97zV75X.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-gSzAyaCZ.css">
+    <style>
+      /* iOS 27: an opaque, full-width fixed strip at the very top edge makes WebKit fill the
+         status-bar band with this color instead of drawing the frosted scroll-edge blur. */
+      .ios-top-edge {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        width: 100%;
+        height: max(11px, env(safe-area-inset-top, 0px));
+        background: var(--ios-top-edge-color, var(--room, #140c07));
+        pointer-events: none;
+        z-index: 30;
+      }
+      /* Dialogs are drawn inside #app (its own layer), so drop the strip under them while one is open. */
+      body:has(#app .overlay) .ios-top-edge, body.admin-mode .ios-top-edge { z-index: auto; }
+      /* Keep top content (top bar, HUD, home buttons) clear of the strip when there's no inset. */
+      :root { --safe-top: max(11px, env(safe-area-inset-top, 0px)); }
+    </style>
   </head>
   <body>
+    <div class="ios-top-edge" aria-hidden="true"></div>
     <canvas id="scene" aria-label="ChipWreck game board"></canvas>
     <div id="app"></div>
     <noscript>
