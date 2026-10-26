@@ -21,12 +21,47 @@
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=2" />
     <link rel="manifest" href="manifest.webmanifest" />
     <title>ChipWreck</title>
-    <script type="module" crossorigin src="./assets/index-hFrIuhmg.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-CmKBYNwL.css">
+    <style>
+      /* The loading screen: at start-up (this splash) and while a game is boarded (src/ui/boarding.ts). */
+      .loading { position: fixed; inset: 0; z-index: 70; overflow: hidden; background: #08101a; color: #f3e6c8; font-family: Georgia, serif; opacity: 1; transition: opacity .35s ease; }
+      .loading.away { opacity: 0; pointer-events: none; }
+      .ld-bg, .ld-bg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      .loading::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(4,8,14,.35) 0%, rgba(4,8,14,0) 22%, rgba(4,8,14,0) 62%, rgba(4,8,14,.85) 100%); }
+      .ld-logo { position: absolute; z-index: 1; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 3vh); transform: translateX(-50%); width: min(78vw, 46vh, 560px); height: auto; filter: drop-shadow(0 6px 14px rgba(0,0,0,.6)); }
+      .ld-foot { position: absolute; z-index: 1; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom, 0px) + 4vh); display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 0 16px; text-align: center; text-shadow: 0 2px 6px rgba(0,0,0,.8); }
+      .ld-title { font-family: var(--font-title, 'IM Fell English', Georgia, serif); font-size: 22px; min-height: 1.3em; }
+      .ld-title b { color: #f0c457; font-weight: 400; }
+      .ld-bar { --p: 0; position: relative; width: min(92vw, 560px); aspect-ratio: 10 / 1; margin-top: 30px; }
+      .ld-frame { position: absolute; inset: 0; width: 100%; height: 100%; }
+      .ld-fill { position: absolute; left: 6%; top: 38%; height: 45%; width: calc(88% * var(--p)); border-radius: 3px; background: url("loading-bar-fill.webp") left center / auto 100% repeat-x; box-shadow: 0 0 10px rgba(240,196,87,.45); transition: width .25s ease-out; }
+      .ld-ship { position: absolute; left: calc(6% + 88% * var(--p)); bottom: 62%; width: 18%; max-width: 64px; aspect-ratio: 1; transform: translateX(-50%); transition: left .25s ease-out; }
+      .ld-ship img { width: 100%; height: 100%; display: block; animation: ld-bob 1.4s ease-in-out infinite; filter: drop-shadow(0 3px 4px rgba(0,0,0,.5)); }
+      @keyframes ld-bob { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-4px) rotate(3deg); } }
+      .ld-text { font-size: 15px; color: #d9cba8; min-height: 1.4em; }
+      @media (prefers-reduced-motion: reduce) { .ld-ship img { animation: none; } }
+    </style>
+    <script type="module" crossorigin src="./assets/index-BFat4y8A.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CJq_XOoo.css">
   </head>
   <body>
     <canvas id="scene" aria-label="ChipWreck game board"></canvas>
     <div id="app"></div>
+    <div class="loading" id="splash" role="status" aria-live="polite">
+      <picture class="ld-bg"><source media="(orientation: portrait)" srcset="loading-portrait.webp" /><img src="./loading-landscape.webp" alt="" /></picture>
+      <img class="ld-logo" src="./logo.webp" width="1200" height="600" alt="ChipWreck" />
+      <div class="ld-foot">
+        <div class="ld-title"></div>
+        <div class="ld-bar"><img class="ld-frame" src="./loading-bar-frame.webp" alt="" /><div class="ld-fill"></div><div class="ld-ship"><img src="./loading-ship.webp" alt="" /></div></div>
+        <div class="ld-text">Hoisting the sails…</div>
+      </div>
+    </div>
+    <script>
+      // The bar creeps on while the game downloads; the app takes it over (or clears it) once it starts.
+      (function () {
+        var bar = document.querySelector('#splash .ld-bar'), p = 0;
+        window.__splashCreep = setInterval(function () { p += (0.6 - p) * 0.05; bar.style.setProperty('--p', p.toFixed(3)); }, 120);
+      })();
+    </script>
     <noscript>
       <h1>ChipWreck — The Legendary Rescue</h1>
       <p>A free 3D flick-and-rescue board game for 1 to 6 players by Grudge Match Games. Please turn on JavaScript to play.</p>
